@@ -42,8 +42,21 @@ ROMAN_CHAR_DICT = {
 }
 
 OFFSET_DEFAULT = (0, 0)
+
 OFFSET_CENTURY = {
     'FIRST_HALF': (0, -50),
     'SECOND_HALF': (50, 0),
     'HALF': (30, -30),
+}
+
+OFFSET_YEAR = {
+    'FIRST_HALF': (1, 6),
+    'SECOND_HALF': (6, 12),
+    'HALF': (3, 9),
+}
+
+OFFSET_MONTH = {
+    'FIRST_HALF': (1, 15),
+    'SECOND_HALF': (15, 30),
+    'HALF': (10, 20),
 }

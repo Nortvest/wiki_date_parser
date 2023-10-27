@@ -18,7 +18,7 @@ def handler_month_name(month_name: str) -> int:
             return MONTH_NAME_LIST.index(normalized_month_name) + 1
 
 
-def handler_roman_numeral(data: 'SliceCentury') -> Range:
+def handler_roman_century(data: 'SliceCentury') -> Range:
     roman_numeral = data.century
     slice_century = data.slice
 

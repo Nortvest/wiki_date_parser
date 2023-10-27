@@ -6,7 +6,7 @@ from yargy.predicates import gte, lte, eq, caseless, normalized, dictionary
 from loguru import logger
 from razdel import sentenize
 
-from .handlers import handler_month_name, handler_roman_numeral
+from .handlers import handler_month_name, handler_roman_century
 from .settings import MONTH_NAME_LIST, ROMAN_CHAR_DICT
 from .rule_slices import FIRST_HALF, SECOND_HALF, HALF
 
@@ -17,7 +17,6 @@ Date = fact(
 )
 
 SEPARATOR = dictionary({'-', '.', ','})
-DOT = eq('.')
 
 MONTHS = dictionary(MONTH_NAME_LIST)
 DAY = and_(gte(1), lte(31)).interpretation(Date.day.custom(int))
@@ -55,15 +54,17 @@ def get_date_string() -> Rule:
     month_name = MONTHS.interpretation(
         Date.month.custom(handler_month_name)
     )
-    year_words = or_(caseless('г'), normalized('год'))
+    year_words = or_(
+        rule(caseless('г'), eq('.').optional()),
+        rule(normalized('год'))
+    )
 
     return rule(or_(*[
         rule(
             YEAR,
             year_words,
-            DOT.optional()
         ),
-        rule(
+        rule(  # Скобки разрешают даты типа: "(2 ноября) 1721 года" и "(14) сентября 1917 года"
             eq('(').optional(),
             DAY.optional(),
             eq(')').optional(),
@@ -71,8 +72,7 @@ def get_date_string() -> Rule:
             eq(')').optional(),
             SEPARATOR.optional(),
             YEAR.optional(),
-            year_words.optional(),
-            DOT.optional()
+            year_words.optional()
         ),
     ]))
 
@@ -95,8 +95,9 @@ def get_century() -> Rule:
     )
 
     century_words = or_(caseless('в'), normalized('век'))
+    roman_char = dictionary(ROMAN_CHAR_DICT.keys())
 
-    century = rule(
+    roman_century = rule(
         or_(
             FIRST_HALF,
             SECOND_HALF,
@@ -104,19 +105,26 @@ def get_century() -> Rule:
         ).optional().interpretation(
             SliceCentury.slice
         ),
-        dictionary(ROMAN_CHAR_DICT.keys()).interpretation(
+        roman_char.interpretation(
             SliceCentury.century
         )
     ).interpretation(
         SliceCentury
     ).interpretation(
-        Date.year.custom(handler_roman_numeral)
+        Date.year.custom(handler_roman_century)
     )
 
+    arabic_century = and_(
+        gte(1),
+        lte(25)
+    ).interpretation(Date.day.custom(int))
+
     return rule(
-        century,
-        century_words,
-        DOT.optional()
+        or_(
+            roman_century,
+            arabic_century
+        ),
+        century_words
     )
 
 
