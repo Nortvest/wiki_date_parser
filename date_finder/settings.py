@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+
 MONTH_NAME_LIST = [
     'январь',
     'февраль',
@@ -41,22 +44,26 @@ ROMAN_CHAR_DICT = {
     'XXV': 25
 }
 
-OFFSET_DEFAULT = (0, 0)
 
-OFFSET_CENTURY = {
-    'FIRST_HALF': (0, -50),
-    'SECOND_HALF': (50, 0),
-    'HALF': (30, -30),
-}
+@dataclass
+class Offset:
+    OFFSET_DEFAULT_YEAR = (0, 0)
+    OFFSET_YEAR = {
+        'FIRST_HALF': (0, -50),
+        'SECOND_HALF': (50, 0),
+        'HALF': (30, -30),
+    }
 
-OFFSET_YEAR = {
-    'FIRST_HALF': (1, 6),
-    'SECOND_HALF': (6, 12),
-    'HALF': (3, 9),
-}
+    OFFSET_DEFAULT_MONTH = (1, 12)
+    OFFSET_MONTH = {
+        'FIRST_HALF': (1, 6),
+        'SECOND_HALF': (6, 12),
+        'HALF': (3, 9),
+    }
 
-OFFSET_MONTH = {
-    'FIRST_HALF': (1, 15),
-    'SECOND_HALF': (15, 30),
-    'HALF': (10, 20),
-}
+    OFFSET_DEFAULT_DAY = (1, 31)
+    OFFSET_DAY = {
+        'FIRST_HALF': (1, 15),
+        'SECOND_HALF': (15, 31),
+        'HALF': (10, 20),
+    }
