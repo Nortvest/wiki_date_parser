@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from date_finder import find_dates
 
 
-URL = 'https://ru.wikipedia.org/wiki/%D0%9B%D0%B8%D1%82%D0%B2%D0%B0'
+URL = 'https://ru.wikipedia.org/wiki/%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8F'
 response = requests.get(URL)
 
 soup = BeautifulSoup(response.text, 'lxml')
@@ -23,4 +23,4 @@ for p in main_block.find_all('p'):
     # Добавить:
     # 1) Печечисления (через "," и "и")
     # 2) Периуды (через "-" и "с ... до\по ...")
-    # 3) Века
+    # 3) Слайсы есть только для веков. (года, месяцы)
