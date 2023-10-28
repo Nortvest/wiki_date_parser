@@ -8,7 +8,8 @@ from razdel import sentenize
 
 from .handlers import (handler_month_name,
                        handler_slice_month,
-                       handler_slice_year)
+                       handler_slice_year,
+                       handlers_slice_day)
 from .settings import MONTH_NAME_LIST, ROMAN_CHAR_DICT
 from .rule_slices import FIRST_HALF, SECOND_HALF, HALF
 
@@ -20,9 +21,14 @@ Date = fact(
 
 SEPARATOR = dictionary({'-', '.', ','})
 
-MONTHS = dictionary(MONTH_NAME_LIST)
 DAY = and_(gte(1), lte(31)).interpretation(Date.day.custom(int))
 YEAR = and_(gte(250), lte(2100)).interpretation(Date.year.custom(int))
+
+SLICE = or_(
+    FIRST_HALF,
+    SECOND_HALF,
+    HALF
+).optional()
 
 
 def get_date_numerical() -> Rule:
@@ -54,7 +60,7 @@ def get_date_string() -> Rule:
     Даты типа: "yyyy год." и "dd mmmm yyyy год."
     """
 
-    month_name = MONTHS.interpretation(
+    month_name = dictionary(MONTH_NAME_LIST).interpretation(
         Date.month.custom(handler_month_name)
     )
 
@@ -63,22 +69,33 @@ def get_date_string() -> Rule:
         rule(normalized('год'))
     )
 
+    # Обработка года и его частей: "В начале 2012 года", "В конце 1241 г."
     year_only = rule(
-        or_(
-            FIRST_HALF,
-            SECOND_HALF,
-            HALF
-        ).optional().interpretation(
+        SLICE.interpretation(
             Date.month.custom(handler_slice_month)
         ),
-        YEAR.interpretation(Date.year),
+        YEAR,
         year_words,
+    ).interpretation(
+        Date
+    )
+
+    # Обработка месяца + года и его частей мемяца:
+    # "В начале мая 2012 года", "В конце сентября 1241 г."
+    month_and_year_date = rule(
+        SLICE.interpretation(
+            Date.day.custom(handlers_slice_day)
+        ),
+        month_name,
+        YEAR.optional(),
+        year_words.optional()
     ).interpretation(
         Date
     )
 
     return or_(
         year_only,
+        month_and_year_date,
         rule(  # Скобки разрешают даты типа: "(2 ноября) 1721 года" и "(14) сентября 1917 года"
             eq('(').optional(),
             DAY.optional(),
@@ -88,7 +105,7 @@ def get_date_string() -> Rule:
             SEPARATOR.optional(),
             YEAR.optional(),
             year_words.optional()
-        ),
+        )
     )
 
 
@@ -117,11 +134,7 @@ def get_century() -> Rule:
     ).interpretation(Date.year.custom(int))
 
     century = rule(
-        or_(
-            FIRST_HALF,
-            SECOND_HALF,
-            HALF
-        ).optional().interpretation(
+        SLICE.interpretation(
             SliceCentury.slice
         ),
         or_(
