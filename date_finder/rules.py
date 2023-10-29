@@ -3,9 +3,6 @@ from yargy import rule, and_, or_, Parser
 from yargy.interpretation import fact
 from yargy.predicates import gte, lte, eq, caseless, normalized, dictionary
 
-from loguru import logger
-from razdel import sentenize
-
 from .handlers import (handler_month_name,
                        handler_slice_month,
                        handler_slice_year,
@@ -166,13 +163,3 @@ def get_full_date_rule() -> Rule:
 
 
 PARSER = Parser(get_full_date_rule())
-
-
-def find_dates(text: str):
-    sentences = [_.text for _ in sentenize(text)]
-    for sent in sentences:
-        dates = [_.fact for _ in PARSER.findall(sent)]
-        if dates:
-            logger.success(f'{dates} | {sent}')
-        else:
-            logger.info(f'| {sent}')

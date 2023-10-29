@@ -46,6 +46,12 @@ ROMAN_CHAR_DICT = {
 
 
 @dataclass
+class Range:
+    start: int
+    end: int
+
+
+@dataclass
 class Offset:
     OFFSET_DEFAULT_YEAR = (0, 0)
     OFFSET_YEAR = {

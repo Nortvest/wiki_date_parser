@@ -1,15 +1,10 @@
 from dataclasses import dataclass
+from enum import Enum
 
 from yargy.predicates.bank import activate
 from yargy.predicates import normalized
 
-from .settings import Offset, MONTH_NAME_LIST, ROMAN_CHAR_DICT
-
-
-@dataclass
-class Range:
-    start: int
-    end: int
+from .settings import Offset, MONTH_NAME_LIST, ROMAN_CHAR_DICT, Range
 
 
 def handler_month_name(month_name: str) -> int:
