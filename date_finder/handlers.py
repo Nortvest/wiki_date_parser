@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from enum import Enum
+from calendar import monthrange
 
 from yargy.predicates.bank import activate
 from yargy.predicates import normalized
@@ -30,5 +29,12 @@ def handler_slice_month(diapason_month_name: str) -> Range:
     return Range(*Offset.OFFSET_MONTH.get(diapason_month_name, Offset.OFFSET_DEFAULT_MONTH))
 
 
-def handlers_slice_day(diapason_day_name: str) -> Range:
-    return Range(*Offset.OFFSET_DAY.get(diapason_day_name, Offset.OFFSET_DEFAULT_MONTH))
+def handler_slice_day(diapason_day_name: str) -> Range:
+    return Range(*Offset.OFFSET_DAY.get(diapason_day_name, Offset.OFFSET_DEFAULT_DAY))
+
+
+def handler_correct_slice_day(date: 'Date') -> 'Date':
+    _, num_days = monthrange(date.year, date.month)
+    if date.day.end == Offset.OFFSET_DAY['SECOND_HALF'][1]:
+        date.day.end = num_days
+    return date

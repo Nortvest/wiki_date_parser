@@ -1,14 +1,19 @@
 from loguru import logger
-from razdel import sentenize
 
-from .rules import PARSER
+from .rule.rules import PARSER
+from .settings import Range
+from .handlers import handler_correct_slice_day
 
 
 def find_dates(text: str):
-    sentences = [_.text for _ in sentenize(text)]
-    for sent in sentences:
-        dates = [_.fact for _ in PARSER.findall(sent)]
-        if dates:
-            logger.success(f'{dates} | {sent}')
+    dates = []
+    for date in PARSER.findall(text):
+        if isinstance(date.fact.day, Range):
+            dates.append(handler_correct_slice_day(date.fact))
         else:
-            logger.info(f'| {sent}')
+            dates.append(date.fact)
+
+    if dates:
+        logger.success(f'{dates} | {text}')
+    else:
+        logger.info(f'| {text}')

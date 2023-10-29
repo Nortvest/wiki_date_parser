@@ -3,11 +3,11 @@ from yargy import rule, and_, or_, Parser
 from yargy.interpretation import fact
 from yargy.predicates import gte, lte, eq, caseless, normalized, dictionary
 
-from .handlers import (handler_month_name,
+from ..handlers import (handler_month_name,
                        handler_slice_month,
                        handler_slice_year,
-                       handlers_slice_day)
-from .settings import MONTH_NAME_LIST, ROMAN_CHAR_DICT
+                       handler_slice_day)
+from ..settings import MONTH_NAME_LIST, ROMAN_CHAR_DICT
 from .rule_slices import FIRST_HALF, SECOND_HALF, HALF
 
 
@@ -81,7 +81,7 @@ def get_date_string() -> Rule:
     # "В начале мая 2012 года", "В конце сентября 1241 г."
     month_and_year_date = rule(
         SLICE.interpretation(
-            Date.day.custom(handlers_slice_day)
+            Date.day.custom(handler_slice_day)
         ),
         month_name,
         YEAR.optional(),

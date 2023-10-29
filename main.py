@@ -2,6 +2,7 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
+from razdel import sentenize
 
 from date_finder import find_dates
 
@@ -18,7 +19,9 @@ for p in main_block.find_all('p'):
     # Удаление из текста сносок типа: [8], [n]
     text = re.sub(r'\[\d+\]', '', text)
 
-    find_dates(text)
+    sentences = [_.text for _ in sentenize(text)]
+    for sent in sentences:
+        find_dates(sent)
 
     # Добавить:
     # 1) Печечисления (через "," и "и")
