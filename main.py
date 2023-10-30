@@ -22,8 +22,3 @@ for p in main_block.find_all('p'):
     sentences = [_.text for _ in sentenize(text)]
     for sent in sentences:
         find_dates(sent)
-
-    # Добавить:
-    # 1) Печечисления (через "," и "и")
-    # 2) Периуды (через "-" и "с ... до\по ...") (По настоящее время)
-    # 3) Слайсы для конца любого месяца: 15 - 31. (Доработать)

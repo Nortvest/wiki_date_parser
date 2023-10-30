@@ -4,11 +4,14 @@ from yargy.interpretation import fact
 from yargy.predicates import gte, lte, eq, caseless, normalized, dictionary
 
 from ..handlers import (handler_month_name,
-                       handler_slice_month,
-                       handler_slice_year,
-                       handler_slice_day)
+                        handler_slice_month,
+                        handler_slice_year,
+                        handler_slice_day,
+                        handler_int_period,
+                        handler_range_period)
 from ..settings import MONTH_NAME_LIST, ROMAN_CHAR_DICT
 from .rule_slices import FIRST_HALF, SECOND_HALF, HALF
+from .rule_periods import get_period_rule
 
 
 Date = fact(
@@ -21,7 +24,7 @@ SEPARATOR = dictionary({'-', '.', ','})
 DAY = and_(gte(1), lte(31)).interpretation(Date.day.custom(int))
 YEAR = and_(gte(250), lte(2100)).interpretation(Date.year.custom(int))
 
-SLICE = or_(
+SLICE_OPTIONAL = or_(
     FIRST_HALF,
     SECOND_HALF,
     HALF
@@ -68,31 +71,39 @@ def get_date_string() -> Rule:
 
     # Обработка года и его частей: "В начале 2012 года", "В конце 1241 г."
     year_only = rule(
-        SLICE.interpretation(
-            Date.month.custom(handler_slice_month)
+        or_(
+            get_period_rule(YEAR).interpretation(Date.year.custom(handler_int_period)),
+            rule(
+                SLICE_OPTIONAL.interpretation(Date.month.custom(handler_slice_month)),
+                YEAR
+            ),
         ),
-        YEAR,
         year_words,
-    ).interpretation(
-        Date
-    )
+    ).interpretation(Date)
 
     # Обработка месяца + года и его частей мемяца:
     # "В начале мая 2012 года", "В конце сентября 1241 г."
     month_and_year_date = rule(
-        SLICE.interpretation(
-            Date.day.custom(handler_slice_day)
+        or_(
+            get_period_rule(month_name).interpretation(Date.month.custom(handler_int_period)),
+            rule(
+                SLICE_OPTIONAL.interpretation(Date.day.custom(handler_slice_day)),
+                month_name
+            ),
         ),
-        month_name,
         YEAR.optional(),
         year_words.optional()
-    ).interpretation(
-        Date
+    ).interpretation(Date)
+
+    period_days = rule(  # Периуды в днях в датах: "с 12 по 23 декабря 1243 год", "1-12 ноября 1234 года"
+        get_period_rule(DAY).interpretation(Date.day.custom(handler_int_period)),
+        month_name,
+        SEPARATOR.optional(),
+        YEAR.optional(),
+        year_words.optional()
     )
 
     return or_(
-        year_only,
-        month_and_year_date,
         rule(  # Скобки разрешают даты типа: "(2 ноября) 1721 года" и "(14) сентября 1917 года"
             eq('(').optional(),
             DAY.optional(),
@@ -102,7 +113,10 @@ def get_date_string() -> Rule:
             SEPARATOR.optional(),
             YEAR.optional(),
             year_words.optional()
-        )
+        ),
+        period_days,
+        month_and_year_date,
+        year_only
     )
 
 
@@ -131,15 +145,11 @@ def get_century() -> Rule:
     ).interpretation(Date.year.custom(int))
 
     century = rule(
-        SLICE.interpretation(
-            SliceCentury.slice
-        ),
+        SLICE_OPTIONAL.interpretation(SliceCentury.slice),
         or_(
             roman_char,
             arabic_char
-        ).interpretation(
-            SliceCentury.century
-        )
+        ).interpretation(SliceCentury.century)
     ).interpretation(
         SliceCentury
     ).interpretation(
@@ -147,7 +157,10 @@ def get_century() -> Rule:
     )
 
     return rule(
-        century,
+        or_(
+            get_period_rule(century).interpretation(Date.year.custom(handler_range_period)),
+            century
+        ),
         century_words
     )
 
@@ -157,9 +170,7 @@ def get_full_date_rule() -> Rule:
         get_date_numerical(),
         get_date_string(),
         get_century()
-    ).interpretation(
-        Date
-    )
+    ).interpretation(Date)
 
 
 PARSER = Parser(get_full_date_rule())
