@@ -32,7 +32,7 @@ class WikiDateParser:
 
         return texts
 
-    def get_dates_iter(self) -> Generator[Date, str]:
+    def get_dates_iter(self) -> Generator:
         """Проходится по каждому пораграфу, делит их на предложения и находит даты"""
         for text in self.__get_clear_text_from_page():
             sentences = [_.text for _ in sentenize(text)]
