@@ -37,7 +37,7 @@ __WikiDateParser__ can parse many different date patterns.<br>
   - В начале XIX века
   - Середина 1999 года
   - Вторая половина августа 2000 года
-- [x] Periods
+- [x] Period
   - XI - X век
   - май - август 1861 года
   - С 12 до 14 марта 2023 года
