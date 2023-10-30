@@ -21,25 +21,25 @@ Developed using: Yargy: https://github.com/natasha/yargy
 ## Opportunities
 __WikiDateParser__ can parse many different date patterns.<br>
 *Examples:*
--[x] Base date
+- [x] Base date
   - 01.01.2020
   - 08.09.1998
   - 2020.01.01
   - 1998.09.08
--[x] String date
+- [x] String date
   - 1241 году
   - Июль 2023 года
   - 13 ноября 2021 года
--[x] Сentury
+- [x] Сentury
   - XI век
   - VIII в
   - 21 век
--[x] Slice
+- [x] Slice
   - В конце ноября
   - В начале XIX века
   - Середина 1999 года
   - Вторая половина августа 2000 года
--[x] Periods
+- [x] Periods
   - XI - X век
   - май - август 1861 года
   - С 12 до 14 марта 2023 года
