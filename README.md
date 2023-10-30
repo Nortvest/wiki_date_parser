@@ -7,11 +7,9 @@ Developed using: Yargy: https://github.com/natasha/yargy
 >>> url = 'https://ru.wikipedia.org/wiki/Россия'
 >>> wiki_date_parser = WikiDateParser(url)
 >>> print(*wiki_date_parser.get_dates(), sep='\n')
-[
-    ([Date(day=16, month=1, year=2020)], 'C 16 января 2020 года в должности председателя правительства находится Михаил Мишустин.')
-    ...
-    ([Date(day=None, month=None, year=1904)], 'В 1904 году начинается Русско-японская война.')
-]
+  ([Date(day=16, month=1, year=2020)], 'C 16 января 2020 года в должности председателя правительства находится Михаил Мишустин.')
+  ...
+  ([Date(day=None, month=None, year=1904)], 'В 1904 году начинается Русско-японская война.')
 >>>
 >>>
 >>> wiki_date_parser.get_dates_iter()
